@@ -34,6 +34,7 @@ A complete, self-contained suite for system optimization, RAM saving, automated 
 17. **[`17_navidrome_music_server_guide.md`](file:///home/siakshit/Downloads/PC%20Papa/docs/17_navidrome_music_server_guide.md)**: Your self-hosted personal Spotify, music syncing with `rsync`, mobile streaming apps (Symfonium, Substreamer, Feishin).
 18. **[`18_home_server_maintenance_and_backup.md`](file:///home/siakshit/Downloads/PC%20Papa/docs/18_home_server_maintenance_and_backup.md)**: 10-second server health check, safe update routines, time sync with `chrony`, and 1-click full server backup.
 19. **[`19_rebuilding_from_iso_and_hybrid_networking.md`](file:///home/siakshit/Downloads/PC%20Papa/docs/19_rebuilding_from_iso_and_hybrid_networking.md)**: Rebuilding an entire server from a single Ubuntu ISO, fixing Wi-Fi drivers with CLI only (rfkill, phone tethering, offline USB pool), and setting up Wi-Fi, LAN, and Hybrid failover networking.
+20. **[`20_gitlab_on_laptop_guide.md`](file:///home/siakshit/Downloads/PC%20Papa/docs/20_gitlab_on_laptop_guide.md)**: Running lightweight GitLab CE on an 8 GB laptop with on-demand controls (`gitlab start` / `stop` / `status` / `logs` / `password`), Puma tuning, and freed RAM when stopped.
 
 ---
 

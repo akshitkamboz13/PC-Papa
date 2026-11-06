@@ -127,7 +127,13 @@ Explore the guides below based on what you want to understand or fix:
 * Restoring Docker, Caddy, Cloudflare tunnels, Kiwix, Navidrome, and watchdog scripts from zero.
 * 10-second sanity verification and failover stress test.
 
-### 20. 🛠️ [The Non-Tech Human Repair & Fix Manual](file:///home/siakshit/Downloads/PC%20Papa/REPAIR_AND_FIXES.md)
+### 20. 🦊 [GitLab CE on Laptop: Lightweight On-Demand Guide](file:///home/siakshit/Downloads/PC%20Papa/docs/20_gitlab_on_laptop_guide.md)
+* Running self-hosted GitLab on an 8 GB RAM laptop with zero system lag.
+* Low-memory tuning (Puma 2 workers, Sidekiq concurrency 5, disabled Prometheus).
+* Complete CLI tool: `gitlab start`, `gitlab stop`, `gitlab status`, `gitlab logs`, `gitlab password`.
+* Web access on port `8929` and SSH Git clones on port `2224`.
+
+### 21. 🛠️ [The Non-Tech Human Repair & Fix Manual](file:///home/siakshit/Downloads/PC%20Papa/REPAIR_AND_FIXES.md)
 * Instant copy-paste fixes for:
   * "Database is locked" (`db.lck`).
   * "PGP signature / corrupted package" errors.
