@@ -45,19 +45,11 @@ case "${1:-status}" in
           external_url 'http://localhost:${HTTP_PORT}';
           gitlab_rails['gitlab_shell_ssh_port'] = ${SSH_PORT};
           puma['worker_processes'] = 2;
-          puma['min_threads'] = 1;
-          puma['max_threads'] = 4;
+          puma['per_worker_max_memory_mb'] = 1000;
           sidekiq['concurrency'] = 5;
           prometheus_monitoring['enable'] = false;
-          grafana['enable'] = false;
-          alertmanager['enable'] = false;
-          node_exporter['enable'] = false;
-          redis_exporter['enable'] = false;
-          postgres_exporter['enable'] = false;
-          gitlab_exporter['enable'] = false;
           postgresql['shared_buffers'] = '256MB';
           postgresql['max_worker_processes'] = 2;
-          gitaly['ruby_max_rss'] = 200000000;
         " \
         --volume gitlab_config:/etc/gitlab \
         --volume gitlab_logs:/var/log/gitlab \
