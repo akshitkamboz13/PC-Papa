@@ -9,10 +9,23 @@ HTTP_PORT="8929"
 SSH_PORT="2224"
 IMAGE="gitlab/gitlab-ce:latest"
 
+# Auto-detect host: server (si4k-server.local) or local machine (localhost)
+if [ "$(hostname 2>/dev/null || true)" = "si4k-server" ]; then
+  DEFAULT_HOST="si4k-server.local"
+else
+  DEFAULT_HOST="localhost"
+fi
+HOST_ADDR="${GITLAB_HOST:-$DEFAULT_HOST}"
+
 ensure_docker() {
   if ! docker info >/dev/null 2>&1; then
     echo "🐳 Docker daemon is not active. Starting Docker service..."
-    sudo systemctl start docker
+    if sudo -n true 2>/dev/null; then
+      sudo systemctl start docker
+    else
+      echo "⚠️ Docker is not running. Please run: sudo systemctl start docker"
+      exit 1
+    fi
   fi
 }
 
@@ -22,7 +35,7 @@ case "${1:-status}" in
 
     if [ "$(docker ps -q -f name=^/${CONTAINER_NAME}$)" ]; then
       echo "✅ GitLab is already running!"
-      echo "🌐 Web Interface: http://localhost:${HTTP_PORT}"
+      echo "🌐 Web Interface: http://${HOST_ADDR}:${HTTP_PORT}"
       echo "🔑 Root Password: run 'gitlab password'"
       exit 0
     fi
@@ -32,17 +45,17 @@ case "${1:-status}" in
       docker start "${CONTAINER_NAME}" >/dev/null
       echo "✅ GitLab container started!"
     else
-      echo "📦 Creating fresh GitLab CE container (Laptop Low-Memory Optimized)..."
+      echo "📦 Creating fresh GitLab CE container (Low-Memory Optimized)..."
       echo "⚙️  Optimizations: Puma 2 workers, Sidekiq concurrency 5, Prometheus disabled."
       
       docker run --detach \
-        --hostname localhost \
+        --hostname "${HOST_ADDR}" \
         --publish "${HTTP_PORT}:${HTTP_PORT}" \
         --publish "${SSH_PORT}:22" \
         --name "${CONTAINER_NAME}" \
         --restart unless-stopped \
         --env GITLAB_OMNIBUS_CONFIG="
-          external_url 'http://localhost:${HTTP_PORT}';
+          external_url 'http://${HOST_ADDR}:${HTTP_PORT}';
           gitlab_rails['gitlab_shell_ssh_port'] = ${SSH_PORT};
           puma['worker_processes'] = 2;
           puma['per_worker_max_memory_mb'] = 1000;
@@ -61,7 +74,7 @@ case "${1:-status}" in
 
     echo ""
     echo "=========================================================="
-    echo "🌐 Web Interface: http://localhost:${HTTP_PORT}"
+    echo "🌐 Web Interface: http://${HOST_ADDR}:${HTTP_PORT}"
     echo "🔒 SSH Port:      ${SSH_PORT}"
     echo "🔑 Default User:  root"
     echo "🔑 View Password: gitlab password"
@@ -86,7 +99,7 @@ case "${1:-status}" in
     ensure_docker
     echo "🔄 Restarting GitLab container..."
     docker restart "${CONTAINER_NAME}" >/dev/null
-    echo "✅ GitLab restarted: http://localhost:${HTTP_PORT}"
+    echo "✅ GitLab restarted: http://${HOST_ADDR}:${HTTP_PORT}"
     ;;
 
   status)
@@ -99,7 +112,7 @@ case "${1:-status}" in
       echo "📊 Resource Usage:"
       docker stats --no-stream "${CONTAINER_NAME}" --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}"
       echo ""
-      echo "🌐 URL: http://localhost:${HTTP_PORT}"
+      echo "🌐 URL: http://${HOST_ADDR}:${HTTP_PORT}"
     elif [ "$(docker ps -aq -f name=^/${CONTAINER_NAME}$)" ]; then
       echo "🔴 GitLab is STOPPED"
       docker ps -a -f name=^/${CONTAINER_NAME}$ --format "table {{.Names}}\t{{.Status}}"
@@ -141,9 +154,9 @@ case "${1:-status}" in
     ;;
 
   open|url)
-    echo "🌐 http://localhost:${HTTP_PORT}"
+    echo "🌐 http://${HOST_ADDR}:${HTTP_PORT}"
     if command -v xdg-open >/dev/null 2>&1; then
-      xdg-open "http://localhost:${HTTP_PORT}" >/dev/null 2>&1 &
+      xdg-open "http://${HOST_ADDR}:${HTTP_PORT}" >/dev/null 2>&1 &
     fi
     ;;
 
@@ -172,7 +185,7 @@ case "${1:-status}" in
     echo "  gitlab status    - Show container state and RAM usage"
     echo "  gitlab logs      - Stream live logs"
     echo "  gitlab password  - Show initial root login password"
-    echo "  gitlab open      - Open http://localhost:${HTTP_PORT} in browser"
+    echo "  gitlab open      - Open http://${HOST_ADDR}:${HTTP_PORT} in browser"
     echo "  gitlab destroy   - Delete container and persistent volumes"
     exit 1
     ;;

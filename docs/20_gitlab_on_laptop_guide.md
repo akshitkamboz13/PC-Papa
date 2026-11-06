@@ -138,3 +138,49 @@ To verify how much RAM GitLab is consuming right now:
 gitlab status
 ```
 It displays live CPU %, Memory MB, and Memory % without opening full terminal monitors.
+
+---
+
+## 🏰 6. Running GitLab on Your Home Server (`si4k-server.local`)
+
+GitLab is also installed on your home server **`si4k-server.local`**!
+
+### Key Differences on the Server:
+1. **Network-Wide Access**:
+   Unlike your laptop (which defaults to `localhost`), the server automatically exposes GitLab to your entire home network on:
+   ```text
+   http://si4k-server.local:8929
+   (or http://192.168.31.250:8929)
+   ```
+2. **LAN Git Cloning**:
+   You can clone projects from your laptop directly to/from the server:
+   ```bash
+   git clone ssh://git@si4k-server.local:2224/username/project.git
+   ```
+3. **Remote Control from Your Laptop**:
+   You can manage the server's GitLab without opening an interactive SSH terminal:
+   ```bash
+   # Check status on the server:
+   ssh si4k@si4k-server.local gitlab status
+
+   # Start or stop GitLab on the server:
+   ssh si4k@si4k-server.local gitlab start
+   ssh si4k@si4k-server.local gitlab stop
+
+   # Fetch root password from the server:
+   ssh si4k@si4k-server.local gitlab password
+   ```
+
+4. **Add Server Git Shortcut (`~/.ssh/config`)**:
+   Add this to your laptop's `~/.ssh/config`:
+   ```ssh
+   Host home-gitlab
+       HostName si4k-server.local
+       Port 2224
+       User git
+       IdentityFile ~/.ssh/id_ed25519
+   ```
+   Now clone easily with:
+   ```bash
+   git clone git@home-gitlab:username/repo.git
+   ```

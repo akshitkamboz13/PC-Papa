@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Si4k Hub // Home Server Portal</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(99, 102, 241, 0.4);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-green: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --glow: rgba(99, 102, 241, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(120deg, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #34d399;
+      padding: 0.45rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Quick Info Bar */
+    .info-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      padding: 0.85rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .info-item strong {
+      color: var(--text-main);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Search & Filter */
+    .search-box {
+      margin-top: 0.5rem;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.9rem 1.25rem 0.9rem 2.85rem;
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--glow);
+      background: rgba(17, 24, 39, 0.9);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--primary)), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--card-hover-border);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--glow);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .port-pill {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      min-height: 2.7rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #94a3b8;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+    }
+
+    .btn-launch {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-launch:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-copy {
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* CLI Quick Reference Section */
+    .cli-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-top: 1rem;
+    }
+
+    .cli-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cli-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .cli-snippet {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+    }
+
+    .cli-snippet code {
+      color: #38bdf8;
+    }
+
+    .copy-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #94a3b8;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.15s;
+    }
+
+    .copy-pill:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.85rem 1.25rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 1.5rem 1rem; }
+      .services-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-icon">🚀</div>
+          <div>
+            <h1>Si4k Hub</h1>
+            <div class="subtitle">Home Server Command & Active Port Navigator</div>
+          </div>
+        </div>
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Server Online</span>
+        </div>
+      </div>
+
+      <div class="info-bar">
+        <div class="info-item">
+          <span>Hostname:</span>
+          <strong id="display-host">si4k-server.local</strong>
+        </div>
+        <div class="info-item">
+          <span>LAN IP:</span>
+          <strong>192.168.31.250</strong>
+        </div>
+        <div class="info-item">
+          <span>Reverse Proxy:</span>
+          <strong>Caddy (Port 80/443)</strong>
+        </div>
+        <div class="info-item">
+          <span>OS:</span>
+          <strong>Ubuntu Server 24.04</strong>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search active services, ports, or descriptions (e.g. 8929, gitlab, music)...">
+      </div>
+    </header>
+
+    <main>
+      <div class="services-grid" id="servicesGrid">
+        
+        <!-- GitLab CE -->
+        <div class="card" style="--card-accent: #f97316;" data-keywords="gitlab git code repos 8929 2224 devops">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🦊</div>
+                <div class="card-title">GitLab CE</div>
+              </div>
+              <span class="port-pill">:8929</span>
+            </div>
+            <p class="card-desc">Self-hosted Git repositories, pull requests, issue tracker, and DevOps pipeline manager.</p>
+            <div class="card-tags">
+              <span class="tag">Port 8929</span>
+              <span class="tag">SSH 2224</span>
+              <span class="tag">Docker</span>
+              <span class="tag">Low-Memory</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="btn-launch dynamic-link" data-port="8929" target="_blank">Open GitLab ↗</a>
+            <button class="btn-copy" onclick="copyText('ssh://git@' + currentHost + ':2224/', 'Git clone SSH URL copied!')">📋 SSH</button>
+          </div>
+        </div>
+
+        <!-- Kiwix Offline Knowledge -->
+        <div class="card" style="--card-accent: #06b6d4;" data-keywords="kiwix wiki wikipedia library offline docs 8080 zim">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">📚</div>
+                <div class="card-title">Kiwix Library</div>
+              </div>
+              <span class="port-pill">/wiki & :8080</span>
+            </div>
+            <p class="card-desc">Offline Wikipedia, WikiHow, GeeksforGeeks, and technical document archives.</p>
+            <div class="card-tags">
+              <span class="tag">Path /wiki</span>
+              <span class="tag">Port 8080</span>
+              <span class="tag">ZIM Reader</span>
+              <span class="tag">Offline</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="/wiki" class="btn-launch" target="_blank">Open Library ↗</a>
+            <a href="#" class="btn-copy dynamic-link" data-port="8080" target="_blank">:8080</a>
+          </div>
+        </div>
+
+        <!-- Navidrome Music -->
+        <div class="card" style="--card-accent: #10b981;" data-keywords="navidrome music audio spotify stream songs 4533 subsonic">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🎵</div>
+                <div class="card-title">Navidrome</div>
+              </div>
+              <span class="port-pill">:4533</span>
+            </div>
+            <p class="card-desc">Personal self-hosted Spotify. Stream your local FLAC/MP3 music collection anywhere.</p>
+            <div class="card-tags">
+              <span class="tag">Port 4533</span>
+              <span class="tag">Audio Stream</span>
+              <span class="tag">Subsonic API</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="btn-launch dynamic-link" data-port="4533" target="_blank">Open Music ↗</a>
+            <button class="btn-copy" onclick="copyText('http://' + currentHost + ':4533', 'Navidrome API URL copied!')">📋 URL</button>
+          </div>
+        </div>
+
+        <!-- Si4k Search -->
+        <div class="card" style="--card-accent: #3b82f6;" data-keywords="search searxng si4k query google web 3000">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🔍</div>
+                <div class="card-title">Si4k Search</div>
+              </div>
+              <span class="port-pill">:3000</span>
+            </div>
+            <p class="card-desc">Private self-hosted metasearch engine. Zero tracking, ad-free private web queries.</p>
+            <div class="card-tags">
+              <span class="tag">Port 3000</span>
+              <span class="tag">Privacy</span>
+              <span class="tag">Docker</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="btn-launch dynamic-link" data-port="3000" target="_blank">Open Search ↗</a>
+          </div>
+        </div>
+
+        <!-- Cockpit Web Console -->
+        <div class="card" style="--card-accent: #a855f7;" data-keywords="cockpit console admin terminal metrics stats 9090 ubuntu">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🎛️</div>
+                <div class="card-title">Cockpit Console</div>
+              </div>
+              <span class="port-pill">:9090 (HTTPS)</span>
+            </div>
+            <p class="card-desc">Web-based server administrator dashboard. Monitor CPU, RAM, disk health, and logs.</p>
+            <div class="card-tags">
+              <span class="tag">Port 9090</span>
+              <span class="tag">HTTPS</span>
+              <span class="tag">Systemd Admin</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a href="#" class="btn-launch dynamic-link" data-port="9090" data-protocol="https:" target="_blank">Open Console ↗</a>
+          </div>
+        </div>
+
+        <!-- XRDP Remote Desktop -->
+        <div class="card" style="--card-accent: #f59e0b;" data-keywords="xrdp rdp remote desktop gui screen 3389">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🖥️</div>
+                <div class="card-title">Remote Desktop (RDP)</div>
+              </div>
+              <span class="port-pill">:3389</span>
+            </div>
+            <p class="card-desc">Full graphical Linux desktop access via Windows Remote Desktop or Remmina.</p>
+            <div class="card-tags">
+              <span class="tag">Port 3389</span>
+              <span class="tag">XRDP</span>
+              <span class="tag">GUI Desktop</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-launch" onclick="copyText(currentHost + ':3389', 'RDP connection address copied!')">Copy RDP Address 📋</button>
+          </div>
+        </div>
+
+        <!-- OpenSSH Shell -->
+        <div class="card" style="--card-accent: #64748b;" data-keywords="ssh terminal shell bash cli 22 open">
+          <div>
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">🔒</div>
+                <div class="card-title">OpenSSH Server</div>
+              </div>
+              <span class="port-pill">:22</span>
+            </div>
+            <p class="card-desc">Secure remote command-line administration via Ed25519 key authentication.</p>
+            <div class="card-tags">
+              <span class="tag">Port 22</span>
+              <span class="tag">SSH</span>
+              <span class="tag">Terminal</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-launch" onclick="copyText('ssh si4k@' + currentHost, 'SSH login command copied!')">Copy SSH Command 📋</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Server Cheatsheet -->
+      <section class="cli-section">
+        <div class="cli-title">⚡ Quick Server CLI Commands (Run via SSH)</div>
+        <div class="cli-grid">
+          <div class="cli-snippet">
+            <span>GitLab Status: <code>gitlab status</code></span>
+            <button class="copy-pill" onclick="copyText('ssh si4k@' + currentHost + ' gitlab status')">Copy</button>
+          </div>
+          <div class="cli-snippet">
+            <span>Docker Status: <code>docker ps</code></span>
+            <button class="copy-pill" onclick="copyText('ssh si4k@' + currentHost + ' docker ps')">Copy</button>
+          </div>
+          <div class="cli-snippet">
+            <span>Caddy Reload: <code>caddy reload</code></span>
+            <button class="copy-pill" onclick="copyText('ssh si4k@' + currentHost + ' caddy reload --config /etc/caddy/Caddyfile')">Copy</button>
+          </div>
+          <div class="cli-snippet">
+            <span>GitLab Password: <code>gitlab password</code></span>
+            <button class="copy-pill" onclick="copyText('ssh si4k@' + currentHost + ' gitlab password')">Copy</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Si4k Hub &bull; Powered by Caddy Reverse Proxy &bull; All services hosted locally</p>
+    </footer>
+  </div>
+
+  <div id="toast">✨ Copied to clipboard!</div>
+
+  <script>
+    // Dynamically detect current host (si4k-server.local, 192.168.31.250, or localhost)
+    const currentHost = window.location.hostname || 'si4k-server.local';
+    document.getElementById('display-host').textContent = currentHost;
+
+    // Populate all dynamic port links
+    document.querySelectorAll('.dynamic-link').forEach(link => {
+      const port = link.getAttribute('data-port');
+      const protocol = link.getAttribute('data-protocol') || 'http:';
+      link.href = `${protocol}//${currentHost}:${port}`;
+    });
+
+    // Search / Filter logic
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.card');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      cards.forEach(card => {
+        const text = (card.innerText + ' ' + card.getAttribute('data-keywords')).toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Toast copy helper
+    function copyText(text, message = 'Copied to clipboard!') {
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      }).catch(err => {
+        console.error('Copy failed: ', err);
+      });
+    }
+  </script>
+</body>
+</html>
