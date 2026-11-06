@@ -12,6 +12,7 @@
 
 ## ⚡ Quick Reference Commands
 
+### Lifecycle & Administration
 | Command | What it Does |
 | :--- | :--- |
 | **`gitlab start`** | Boots Docker (if stopped) and launches GitLab on port `8929`. |
@@ -22,6 +23,16 @@
 | **`gitlab open`** | Opens `http://localhost:8929` in your default browser. |
 | **`gitlab restart`** | Restarts the GitLab container. |
 | **`gitlab destroy`** | Deletes the container and all persistent data volumes (prompted). |
+
+### Tri-Node Replication & Sync
+| Command | What it Does |
+| :--- | :--- |
+| **`gitlab -to server`** | Pushes the current branch to Home Server GitLab (`si4k-server.local:8929`). |
+| **`gitlab -to github`** | Pushes the current branch to GitHub (`github.com/akshitkamboz13`). |
+| **`gitlab -to laptop`** | Pushes the current branch to Laptop GitLab (`localhost:8929`). |
+| **`gitlab -to all`** | Replicates current branch across **all 3 nodes** in sequence (Laptop ➔ Server ➔ GitHub). |
+| **`gitlab sync-remotes [repo]`** | Automatically configures `laptop`, `server`, and `github` remotes in current repository. |
+| **`gitlab sync-github`** | Automatically mirrors all repositories from your GitHub account to both GitLabs. |
 
 ---
 
@@ -168,13 +179,84 @@ GitLab is also installed on your home server **`si4k-server.local`**!
 4. **Add Server Git Shortcut (`~/.ssh/config`)**:
    Add this to your laptop's `~/.ssh/config`:
    ```ssh
-   Host home-gitlab
-       HostName si4k-server.local
+   Host gitlab-server
+       HostName 192.168.31.250
        Port 2224
        User git
        IdentityFile ~/.ssh/id_ed25519
    ```
    Now clone easily with:
    ```bash
-   git clone git@home-gitlab:username/repo.git
+   git clone git@gitlab-server:akshitkamboz13/repo.git
    ```
+
+---
+
+## 🔄 7. Tri-Node Git Ecosystem: Laptop ➔ Server ➔ GitHub
+
+Your workflow connects **Laptop GitLab**, **Home Server GitLab**, and **GitHub** into a unified, redundant development ecosystem.
+
+### Node Architecture & Responsibilities:
+
+```mermaid
+flowchart LR
+    A["💻 Laptop GitLab<br/>(Primary Source of Truth)<br/>localhost:8929"] -->|"gitlab -to server"| B["🏰 Home Server GitLab<br/>(Mirror & Runner)<br/>si4k-server.local:8929"]
+    A -->|"gitlab -to github"| C["🐙 GitHub<br/>(Public Portfolio & Off-site)<br/>github.com/akshitkamboz13"]
+    A ==>|"gitlab -to all"| B
+    A ==>|"gitlab -to all"| C
+```
+
+1. **Laptop GitLab (Primary Source of Truth)**:
+   - Where you write code, commit branches, open issues, and test pipelines.
+   - **Golden Rule**: Always commit and develop on Laptop GitLab first.
+
+2. **Home Server GitLab (Persistent Local Mirror & Runner)**:
+   - Runs 24/7 on your home network (`192.168.31.250`).
+   - Acts as a local mirror and continuous backup even when your laptop is offline.
+   - Hosts CI/CD runners and persistent workers.
+
+3. **GitHub (Public Identity & External Mirror)**:
+   - Hosts your public open-source portfolio and external collaborator contributions.
+
+---
+
+### Daily Synchronization Workflow:
+
+#### 1. Setup Remotes in Any Project:
+Inside any project folder (e.g. `PC Papa`), wire up all three remotes in one command:
+```bash
+gitlab sync-remotes
+```
+This automatically establishes:
+* `laptop` ➔ `git@gitlab-laptop:akshitkamboz13/<project>.git`
+* `server` ➔ `git@gitlab-server:akshitkamboz13/<project>.git`
+* `github` ➔ `git@github.com:akshitkamboz13/<project>.git`
+
+#### 2. Selective Pushing:
+* Push only to Home Server:
+  ```bash
+  gitlab -to server
+  ```
+* Push only to GitHub:
+  ```bash
+  gitlab -to github
+  ```
+* Push to Laptop:
+  ```bash
+  gitlab -to laptop
+  ```
+
+#### 3. Full Tri-Node Synchronization:
+To sync your current working branch across all three destinations in sequence:
+```bash
+gitlab -to all
+```
+The CLI validates branch heads and provides clear pass/fail status per node.
+
+#### 4. Mirroring All GitHub Repositories:
+To bulk-mirror all 80+ repositories from your GitHub account to both Laptop and Server GitLabs:
+```bash
+gitlab sync-github
+```
+GitLab native push-to-create automatically initializes missing repositories on both instances without requiring manual web UI creation.
+

@@ -240,9 +240,18 @@ case "${1:-status}" in
     git remote -v
     ;;
 
+  sync-github|sync-github-all)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PYTHON_SCRIPT="$SCRIPT_DIR/sync-github-to-gitlabs.py"
+    if [ ! -f "$PYTHON_SCRIPT" ]; then
+      PYTHON_SCRIPT="$HOME/Downloads/PC Papa/scripts/sync-github-to-gitlabs.py"
+    fi
+    python3 "$PYTHON_SCRIPT"
+    ;;
+
   *)
     echo "🦊 GitLab CLI Controller & Tri-Node Sync"
-    echo "Usage: gitlab {start|stop|restart|status|logs|password|open|-to|sync-remotes}"
+    echo "Usage: gitlab {start|stop|restart|status|logs|password|open|-to|sync-remotes|sync-github}"
     echo ""
     echo "Lifecycle Commands:"
     echo "  gitlab start              - Start GitLab (creates container if first time)"
@@ -260,6 +269,7 @@ case "${1:-status}" in
     echo "  gitlab -to laptop         - Push current branch to Laptop GitLab"
     echo "  gitlab -to all            - Push current branch to Laptop, Server & GitHub"
     echo "  gitlab sync-remotes [name] - Configure laptop, server & github remotes in current repo"
+    echo "  gitlab sync-github        - Replicate all your GitHub profile repositories to Laptop & Server"
     exit 1
     ;;
 esac
