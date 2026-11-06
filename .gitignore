@@ -1,0 +1,19 @@
+# System & Editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs & Temporary files
+*.log
+*.tmp
+*.bak
+*.part
+
+# Backup archives
+*.tar.gz
+*.tar.zst
+*.zip
