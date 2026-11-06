@@ -53,28 +53,22 @@ gitlab start
 
 ---
 
-## 🔑 2. Logging In as Administrator (`root`)
+## 🔑 2. Logging In as Administrator
 
-1. Retrieve your initial root password:
+1. Retrieve your root password:
    ```bash
    gitlab password
-   ```
-   You will see:
-   ```text
-   👤 Username: root
-   Password: <a_random_32_character_string>
    ```
 2. Open GitLab in your browser:
    ```bash
    gitlab open
    ```
-   *(Or navigate directly to `http://localhost:8929`)*.
-3. Sign in with:
-   * **Username**: `root`
-   * **Password**: *(paste the password from step 1)*.
-4. **Change your password immediately**:
+   *(Laptop: `http://localhost:8929` | Server: `http://si4k-server.local:8929`)*.
+3. Sign in with your administrator account:
+   * **Username or Email**: `akshitkamboz13` or `akshitkamboz13@gmail.com`
+   * **Password**: *(your password or initial password from step 1)*.
+4. **Change your password**:
    * Click your avatar in the top-left corner ➔ **Edit profile** ➔ **Password**.
-   * *(Note: The `/etc/gitlab/initial_root_password` file automatically deletes itself after 24 hours for security)*.
 
 ---
 
