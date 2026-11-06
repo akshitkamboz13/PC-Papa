@@ -174,19 +174,92 @@ case "${1:-status}" in
     fi
     ;;
 
+  -to|--to|to)
+    DEST="${2:-all}"
+    BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+    case "$DEST" in
+      server)
+        echo "🏰 Pushing '$BRANCH' to Home Server GitLab..."
+        git push server "$BRANCH"
+        echo "✅ Pushed to Server GitLab successfully!"
+        ;;
+      github)
+        echo "🐙 Pushing '$BRANCH' to GitHub..."
+        git push github "$BRANCH"
+        echo "✅ Pushed to GitHub successfully!"
+        ;;
+      laptop)
+        echo "💻 Pushing '$BRANCH' to Laptop GitLab..."
+        git push laptop "$BRANCH"
+        echo "✅ Pushed to Laptop GitLab successfully!"
+        ;;
+      all)
+        echo "🌐 Synchronizing '$BRANCH' across ALL THREE NODES..."
+        echo "==> 1/3. Pushing to Laptop GitLab (Primary)..."
+        git push laptop "$BRANCH" || echo "⚠️ Laptop GitLab push failed"
+        echo "==> 2/3. Pushing to Home Server GitLab (Mirror)..."
+        git push server "$BRANCH" || echo "⚠️ Home Server GitLab push failed"
+        echo "==> 3/3. Pushing to GitHub (Public Mirror)..."
+        git push github "$BRANCH" || echo "⚠️ GitHub push failed"
+        echo "🎉 Tri-Node push complete!"
+        ;;
+      *)
+        echo "Usage: gitlab -to {server|github|laptop|all}"
+        exit 1
+        ;;
+    esac
+    ;;
+
+  push)
+    # Support: gitlab push -to server / gitlab push --to github / gitlab push server
+    TARGET="${2:-all}"
+    if [ "$TARGET" = "-to" ] || [ "$TARGET" = "--to" ] || [ "$TARGET" = "to" ]; then
+      TARGET="${3:-all}"
+    fi
+    exec "$0" -to "$TARGET"
+    ;;
+
+  sync-remotes)
+    REPO_NAME="${2:-$(basename "$(pwd)")}"
+    USER_NAME="akshitkamboz13"
+    echo "🔗 Wiring Tri-Node remotes for repository: $REPO_NAME..."
+    
+    # Configure Laptop remote
+    git remote add laptop "git@gitlab-laptop:${USER_NAME}/${REPO_NAME}.git" 2>/dev/null || \
+      git remote set-url laptop "git@gitlab-laptop:${USER_NAME}/${REPO_NAME}.git"
+      
+    # Configure Server remote
+    git remote add server "git@gitlab-server:${USER_NAME}/${REPO_NAME}.git" 2>/dev/null || \
+      git remote set-url server "git@gitlab-server:${USER_NAME}/${REPO_NAME}.git"
+      
+    # Configure GitHub remote
+    git remote add github "https://github.com/${USER_NAME}/${REPO_NAME}.git" 2>/dev/null || \
+      git remote set-url github "https://github.com/${USER_NAME}/${REPO_NAME}.git"
+      
+    echo "✅ Remotes successfully wired:"
+    git remote -v
+    ;;
+
   *)
-    echo "🦊 GitLab CLI Controller"
-    echo "Usage: gitlab {start|stop|restart|status|logs|password|open|destroy}"
+    echo "🦊 GitLab CLI Controller & Tri-Node Sync"
+    echo "Usage: gitlab {start|stop|restart|status|logs|password|open|-to|sync-remotes}"
     echo ""
-    echo "Commands:"
-    echo "  gitlab start     - Start GitLab (creates container if first time)"
-    echo "  gitlab stop      - Stop GitLab and free up RAM/CPU"
-    echo "  gitlab restart   - Restart GitLab container"
-    echo "  gitlab status    - Show container state and RAM usage"
-    echo "  gitlab logs      - Stream live logs"
-    echo "  gitlab password  - Show initial root login password"
-    echo "  gitlab open      - Open http://${HOST_ADDR}:${HTTP_PORT} in browser"
-    echo "  gitlab destroy   - Delete container and persistent volumes"
+    echo "Lifecycle Commands:"
+    echo "  gitlab start              - Start GitLab (creates container if first time)"
+    echo "  gitlab stop               - Stop GitLab and free up RAM/CPU"
+    echo "  gitlab restart            - Restart GitLab container"
+    echo "  gitlab status             - Show container state and RAM usage"
+    echo "  gitlab logs               - Stream live logs"
+    echo "  gitlab password           - Show initial root login password"
+    echo "  gitlab open               - Open http://${HOST_ADDR}:${HTTP_PORT} in browser"
+    echo "  gitlab destroy            - Delete container and persistent volumes"
+    echo ""
+    echo "Tri-Node Replication Commands:"
+    echo "  gitlab -to server         - Push current branch to Home Server GitLab"
+    echo "  gitlab -to github         - Push current branch to GitHub"
+    echo "  gitlab -to laptop         - Push current branch to Laptop GitLab"
+    echo "  gitlab -to all            - Push current branch to Laptop, Server & GitHub"
+    echo "  gitlab sync-remotes [name] - Configure laptop, server & github remotes in current repo"
     exit 1
     ;;
 esac
