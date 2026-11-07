@@ -427,9 +427,174 @@
       font-size: 0.85rem;
     }
 
+    /* Tri-Node Sync Widget */
+    .sync-widget {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .sync-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .sync-title-group h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-top: 0.35rem;
+    }
+
+    .sync-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sync-quick-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sync-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .sync-node-card {
+      background: rgba(17, 24, 39, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .sync-node-card:hover {
+      border-color: var(--card-hover-border);
+      background: rgba(17, 24, 39, 0.8);
+    }
+
+    .node-icon {
+      font-size: 1.6rem;
+    }
+
+    .node-info {
+      flex: 1;
+    }
+
+    .node-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .node-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+
+    .node-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .node-pill.online {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .node-pill.offline {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .sync-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .sync-stats-group {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      padding: 0.3rem 0.75rem;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .stat-num {
+      font-weight: 800;
+      color: #fff;
+      font-family: ui-monospace, monospace;
+    }
+
+    .stat-pill.stat-err .stat-num {
+      color: #f87171;
+    }
+
+    .sync-recent {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .sync-recent strong {
+      color: #cbd5e1;
+      font-family: ui-monospace, monospace;
+    }
+
     @media (max-width: 640px) {
       body { padding: 1.5rem 1rem; }
       .services-grid { grid-template-columns: 1fr; }
+      .sync-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -476,6 +641,68 @@
     </header>
 
     <main>
+      <!-- Tri-Node Git Ecosystem Live Telemetry Widget (Phase 6) -->
+      <section class="sync-widget" id="syncWidget">
+        <div class="sync-header">
+          <div class="sync-title-group">
+            <div class="sync-badge">
+              <span class="status-dot"></span>
+              <span id="syncDaemonStatus">Sync Daemon Active</span>
+            </div>
+            <h2>Tri-Node Git Replication Hub</h2>
+            <p class="sync-desc">Distributed fault-tolerant pipeline: <strong>Laptop GitLab</strong> ➔ <strong>Home Server GitLab</strong> ➔ <strong>GitHub</strong></p>
+          </div>
+          <div class="sync-quick-actions">
+            <button class="copy-pill" onclick="copyText('gitlab -to all', 'Copied: gitlab -to all')">📋 gitlab -to all</button>
+            <button class="copy-pill" onclick="copyText('si4k-sync status', 'Copied: si4k-sync status')">📊 si4k-sync status</button>
+          </div>
+        </div>
+
+        <div class="sync-grid">
+          <!-- Node 1: Laptop GitLab -->
+          <div class="sync-node-card" id="node-laptop">
+            <div class="node-icon">💻</div>
+            <div class="node-info">
+              <div class="node-name">Laptop GitLab</div>
+              <div class="node-meta" id="node-laptop-meta">localhost:8929 • Checking...</div>
+            </div>
+            <span class="node-pill online" id="node-laptop-pill">Probing</span>
+          </div>
+
+          <!-- Node 2: Server GitLab -->
+          <div class="sync-node-card" id="node-server">
+            <div class="node-icon">🏰</div>
+            <div class="node-info">
+              <div class="node-name">Server GitLab</div>
+              <div class="node-meta" id="node-server-meta">si4k-server.local:8929 • Checking...</div>
+            </div>
+            <span class="node-pill online" id="node-server-pill">Probing</span>
+          </div>
+
+          <!-- Node 3: GitHub Cloud -->
+          <div class="sync-node-card" id="node-github">
+            <div class="node-icon">🐙</div>
+            <div class="node-info">
+              <div class="node-name">GitHub Cloud</div>
+              <div class="node-meta" id="node-github-meta">github.com/akshitkamboz13 • Checking...</div>
+            </div>
+            <span class="node-pill online" id="node-github-pill">Probing</span>
+          </div>
+        </div>
+
+        <div class="sync-footer">
+          <div class="sync-stats-group">
+            <span class="stat-pill"><span class="stat-num" id="statSynced">-</span> Synced</span>
+            <span class="stat-pill"><span class="stat-num" id="statInProgress">-</span> In Progress</span>
+            <span class="stat-pill"><span class="stat-num" id="statQueued">-</span> Queued</span>
+            <span class="stat-pill stat-err"><span class="stat-num" id="statFailed">-</span> Failed</span>
+          </div>
+          <div class="sync-recent" id="syncRecent">
+            <span>Latest: <strong id="recentJobText">Loading activity...</strong></span>
+          </div>
+        </div>
+      </section>
+
       <div class="services-grid" id="servicesGrid">
         
         <!-- GitLab CE -->
@@ -709,6 +936,71 @@
         console.error('Copy failed: ', err);
       });
     }
+
+    // Live Sync Status Poller (Phase 6)
+    async function updateSyncStatus() {
+      try {
+        const resp = await fetch('/sync-status.json?t=' + Date.now());
+        if (!resp.ok) return;
+        const data = await resp.json();
+
+        // Nodes
+        const nodes = data.nodes || {};
+        updateNodeUI('node-laptop', nodes.laptop_gitlab, 'localhost:8929');
+        updateNodeUI('node-server', nodes.server_gitlab, 'si4k-server.local:8929');
+        updateNodeUI('node-github', nodes.github, 'github.com/akshitkamboz13');
+
+        // Queue
+        const q = data.queue || {};
+        document.getElementById('statSynced').textContent = q.synced || 0;
+        document.getElementById('statInProgress').textContent = (q.locked || 0) + (q.in_progress || 0);
+        document.getElementById('statQueued').textContent = q.queued || 0;
+        document.getElementById('statFailed').textContent = (q.failed || 0) + (q.dead_letter || 0);
+
+        // Recent Job
+        const recent = data.recent_jobs && data.recent_jobs[0];
+        if (recent) {
+          document.getElementById('recentJobText').textContent = 
+            `${recent.project} (${recent.source.replace('_gitlab','')} ➔ ${recent.target.replace('_gitlab','')}) @ ${recent.sha} • ${recent.status.toUpperCase()}`;
+        } else {
+          document.getElementById('recentJobText').textContent = 'Queue is idle';
+        }
+
+        if (data.worker_id) {
+          document.getElementById('syncDaemonStatus').textContent = `Sync Worker Online (${data.worker_id.split('-').pop()})`;
+        }
+      } catch (e) {
+        console.debug('Sync status fetch notice: ', e);
+      }
+    }
+
+    function updateNodeUI(elemId, nodeData, fallbackMeta) {
+      const card = document.getElementById(elemId);
+      if (!card) return;
+      const metaEl = card.querySelector('.node-meta');
+      const pillEl = card.querySelector('.node-pill');
+
+      if (!nodeData) {
+        pillEl.textContent = 'Standby';
+        pillEl.className = 'node-pill offline';
+        metaEl.textContent = fallbackMeta;
+        return;
+      }
+
+      if (nodeData.is_reachable) {
+        pillEl.textContent = `${nodeData.latency_ms ? nodeData.latency_ms + 'ms' : 'Online'}`;
+        pillEl.className = 'node-pill online';
+        metaEl.textContent = `${fallbackMeta} • OK`;
+      } else {
+        pillEl.textContent = 'Offline';
+        pillEl.className = 'node-pill offline';
+        metaEl.textContent = `${fallbackMeta} • Unreachable`;
+      }
+    }
+
+    // Initial fetch and 4s interval
+    updateSyncStatus();
+    setInterval(updateSyncStatus, 4000);
   </script>
 </body>
 </html>

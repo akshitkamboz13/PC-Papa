@@ -260,3 +260,110 @@ gitlab sync-github
 ```
 GitLab native push-to-create automatically initializes missing repositories on both instances without requiring manual web UI creation.
 
+---
+
+## 8. Persistent Sync Worker (`si4k.git-sync`)
+
+To ensure fault tolerance when laptop is offline or network fails, a persistent background daemon runs 24/7 on the Home Server.
+
+### Worker Architecture
+* **Repository Location**: `/home/si4k/si4k.git-sync` on Home Server (`192.168.31.250`).
+* **Database**: `~/.local/share/si4k-git-sync/sync-state.sqlite` (SQLite with WAL mode).
+* **Systemd Service**: `si4k-git-sync.service` (managed under `si4k` user with systemd lingering).
+* **Zero Runtime Dependencies**: Built entirely with Python 3.14 standard library (`sqlite3`, `urllib.request`, `subprocess`, `dataclasses`, `json`).
+* **Memory Footprint**: ~14.9 MB RSS idle.
+
+### Daemon Management Commands
+Run on Home Server (or via SSH):
+```bash
+# Check worker status
+systemctl --user status si4k-git-sync.service
+
+# View live daemon logs
+journalctl --user -u si4k-git-sync.service -f
+
+# Restart sync service
+systemctl --user restart si4k-git-sync.service
+
+# View current replication queue and node status
+si4k-sync status
+
+# Manually enqueue a replication job
+si4k-sync enqueue --project PC-Papa --source server_gitlab --target github --branch main
+```
+
+---
+
+## 9. GitHub Contribution Bridge (PR Ingestion & Hybrid Merge)
+
+External open-source contributors submit Pull Requests to GitHub. The Contribution Bridge safely imports external code for review on GitLab while preserving native GitHub merge status.
+
+### Security & Ingestion Rules
+1. **Zero Untrusted Code in `main`**: Contributor PRs are fetched into isolated mirror refs `github-pr/<pr-id>-<contributor>` and never directly into `main`.
+2. **Safe GitLab MR Creation**: Automatically generates a GitLab Merge Request labeled `external-contributor`, `github-pr`, attributing the original author.
+3. **No Secret Leakage**: CI pipelines on external contributor branches run without production deployment tokens.
+
+### 6-Step Race-Safe Hybrid Merge Protocol
+When you are ready to approve and merge a contribution:
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Akshit (Maintainer)
+    participant GL as Laptop GitLab
+    participant W as Sync Worker (Home Server)
+    participant GH as GitHub API
+    Dev->>GL: Review and Approve GitLab MR
+    Dev->>W: Run si4k-sync pr-merge --project <name> --pr <id>
+    W->>GH: Step 1: Verify PR HEAD SHA has not been tampered with
+    W->>GH: Step 2: Request GitHub native merge (preserve 'Merged' badge)
+    GH-->>W: Merge commit SHA created
+    W->>GL: Step 3: Fetch updated branch into Laptop GitLab
+    W->>GL: Step 4: Verify tree and auto-close GitLab MR
+    W->>W: Step 5: Enqueue replication to Server GitLab
+    W-->>Dev: Hybrid Merge Complete!
+```
+
+### PR Commands:
+```bash
+# List all active GitHub pull requests
+si4k-sync pr-list --project PC-Papa
+
+# Manually ingest a PR and create a review MR on GitLab
+si4k-sync pr-ingest --project PC-Papa --pr 42
+
+# Execute race-safe hybrid merge
+si4k-sync pr-merge --project PC-Papa --pr 42
+```
+
+---
+
+## 10. Two-Way Issue Bridge & Comment Mirroring
+
+Keeps GitHub Issues and GitLab Issues synchronized bi-directionally without manual double-entry.
+
+* **Inbound (GitHub ➔ GitLab)**: New external issues opened on GitHub create matching GitLab issues with labels `github-issue` and cross-reference links.
+* **Outbound (GitLab ➔ GitHub)**: When you close an issue on Laptop GitLab, the bridge automatically closes the corresponding GitHub issue with a completion note.
+* **Bi-Directional Comments**: Comments on either platform are mirrored across with clear author attribution headers `[Comment from GitHub by @user]` or `[Comment from GitLab by @user]`. Duplicate loops are prevented via hash-based tracking table (`issue_comments_synced`).
+
+### Issue Commands:
+```bash
+# List tracked issue mappings
+si4k-sync issue-list --project PC-Papa
+
+# Trigger full bi-directional issue & comment sync
+si4k-sync issue-sync --project PC-Papa
+```
+
+---
+
+## 11. Real-Time Web Portal Telemetry (`http://si4k-server.local/`)
+
+The Home Server Caddy dashboard (`/usr/share/caddy/index.html`) features a responsive glassmorphism **Tri-Node Git Replication Hub** widget that monitors the entire distributed architecture in real time.
+
+### Telemetry Features
+* **Live Node Ping Indicators**: Real-time heartbeat latency for Laptop GitLab (`localhost:8929`), Server GitLab (`192.168.31.250:8929`), and GitHub (`github.com`).
+* **Queue Status Counters**: Live badges for queued, in-progress, synced, and failed operations.
+* **Recent Activity Feed**: Dynamic log of completed replication jobs, source/target nodes, branches, and commit SHAs.
+* **One-Click Quick Actions**: Quick copy buttons for `gitlab -to all` and `si4k-sync status`.
+* **Zero Overhead**: Updated atomically via lightweight JSON export (`sync-status.json`) polled every 4 seconds over AJAX.
+
